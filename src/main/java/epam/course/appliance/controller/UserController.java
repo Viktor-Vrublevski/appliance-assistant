@@ -1,0 +1,52 @@
+package epam.course.appliance.controller;
+
+import epam.course.appliance.entity.User;
+import epam.course.appliance.service.UserService;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+@Controller
+@RequestMapping("/users/v1")
+public class UserController {
+
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @GetMapping("/create-view")
+    public String createUserPage(Model model) {
+        if (!model.containsAttribute("user")) {
+            model.addAttribute("user", new User());
+        }
+        return "create_user";
+    }
+
+    @PostMapping("/create")
+    public String createUser(@RequestParam("username") String username,
+                             @RequestParam("userName") String userName,
+                             @RequestParam("userAddress") String userAddress,
+                             RedirectAttributes redirectAttributes) {
+        try {
+            User user = new User();
+            user.setUsername(username);
+            user.setUserFullName(userName);
+            user.setAddress(userAddress);
+
+            boolean successMessage = userService.saveUser(user);
+            redirectAttributes.addFlashAttribute("successMessage",
+                    successMessage ? String.format("User '%s' saved successfully.", userName)
+                            : String.format("Failed to save user '%s'.", username));
+            return "redirect:/create_user";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("successMessage", "An error occurred while saving the user.");
+            return "redirect:/create_user";
+        }
+    }
+}
