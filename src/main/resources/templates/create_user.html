@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HomeHub - Create User</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 min-h-screen text-slate-800 font-sans antialiased">
+
+<main class="max-w-xl mx-auto p-6 md:p-12">
+    <div class="mb-6">
+        <a th:href="@{/main}" class="text-sm font-medium text-slate-500 hover:text-slate-800 flex items-center space-x-1">
+            <span>&larr;</span> <span>Back to Dashboard</span>
+        </a>
+    </div>
+
+    <!--/*@thymesVar id="successMessage" type=""*/-->
+    <div th:if="${successMessage}"
+         class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-sm"
+         th:text="${successMessage}">
+        Operation completed successfully!
+    </div>
+
+    <section class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="flex items-center space-x-3 mb-4">
+            <div class="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                </svg>
+            </div>
+            <h2 class="text-xl font-bold text-slate-900">Create System User</h2>
+        </div>
+        <p class="text-sm text-slate-500 mb-6">Register a unique identity profile context before attaching home
+            equipment assets.</p>
+
+        <form th:action="@{/users/v1/create}" th:object="${user}" method="POST" class="space-y-4">
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Unique Username
+                    (ID)*</label>
+                <input type="text" name="username" maxlength="100" required placeholder="e.g., john_doe47"
+                       class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-2.5 text-sm outline-none transition"/>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Full Display
+                    Name*</label>
+                <input type="text" name="userName" maxlength="100" required placeholder="John Doe"
+                       class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-2.5 text-sm outline-none transition"/>
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Physical
+                    Delivery Address*</label>
+                <input type="text" name="userAddress" maxlength="100" required placeholder="123 Main St, New York"
+                       class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-2.5 text-sm outline-none transition"/>
+            </div>
+
+            <div class="pt-4 flex items-center space-x-3">
+                <button type="submit"
+                        class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2.5 rounded-xl transition text-sm shadow-sm">
+                    Save Profile Record
+                </button>
+                <a th:href="@{/main}"
+                   class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-sm font-medium transition">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </section>
+</main>
+
+</body>
+</html>

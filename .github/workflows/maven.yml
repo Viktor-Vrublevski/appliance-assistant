@@ -21,5 +21,8 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Build and test
-        run: ./mvnw --batch-mode --no-transfer-progress clean verify
+      - name: Build and Checkstyle
+        run: mvn -B package checkstyle:checkstyle -DskipTests
+
+      - name: Run Unit Tests
+        run: mvn -B test
