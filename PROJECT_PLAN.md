@@ -37,10 +37,10 @@ accurate solutions.
 
 ### UI
 
-![Main Dashboard](./pics/main-page.png)
-![Create User](./pics/create-user.png)
-![Register Appliance](./pics/register-appliance.png)
-![Chat page](./pics/chat.png)
+![Main Dashboard](images/main-page.png)
+![Create User](images/create-user.png)
+![Register Appliance](images/register-appliance.png)
+![Chat page](images/chat.png)
 
 ### Structured Data
 
