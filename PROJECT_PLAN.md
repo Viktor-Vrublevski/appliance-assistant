@@ -35,7 +35,7 @@ accurate solutions.
 
 ## 4. Structure of the Application
 
-### UI – Thymeleaf Framework
+### UI
 
 ![Main Dashboard](./pics/main-page.png)
 ![Create User](./pics/create-user.png)
