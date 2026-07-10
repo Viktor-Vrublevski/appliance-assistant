@@ -20,6 +20,10 @@ public class UserService {
 
     public boolean saveUser(User user) {
         try {
+            if (userRepository.existsById(user.getUsername())) {
+                LOGGER.info("User with username '{}' already exists", user.getUsername());
+                return false;
+            }
             userRepository.save(user);
             LOGGER.info("User saved successfully");
             return true;

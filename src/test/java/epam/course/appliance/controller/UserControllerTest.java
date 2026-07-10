@@ -69,9 +69,9 @@ class UserControllerTest {
                         .param("username", "johndoe")
                         .param("userName", "John Doe")
                         .param("userAddress", "123 Main St"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/create_user"))
-                .andExpect(flash().attribute("successMessage", "User 'John Doe' saved successfully."));
+                .andExpect(status().isOk())
+                .andExpect(view().name("create_user"))
+                .andExpect(model().attribute("successMessage", "User 'John Doe' saved successfully."));
 
         verify(userService, times(1)).saveUser(any(User.class));
     }
@@ -84,9 +84,9 @@ class UserControllerTest {
                         .param("username", "johndoe")
                         .param("userName", "John Doe")
                         .param("userAddress", "123 Main St"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/create_user"))
-                .andExpect(flash().attribute("successMessage", "Failed to save user 'johndoe'."));
+                .andExpect(status().isOk())
+                .andExpect(view().name("create_user"))
+                .andExpect(model().attribute("errorMessage", "Failed to save user 'johndoe' the username already exists."));
     }
 
     @Test
@@ -97,8 +97,8 @@ class UserControllerTest {
                         .param("username", "johndoe")
                         .param("userName", "John Doe")
                         .param("userAddress", "123 Main St"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/create_user"))
-                .andExpect(flash().attribute("successMessage", "An error occurred while saving the user."));
+                .andExpect(status().isOk())
+                .andExpect(view().name("create_user"))
+                .andExpect(model().attribute("errorMessage", "An error occurred while saving the user."));
     }
 }
