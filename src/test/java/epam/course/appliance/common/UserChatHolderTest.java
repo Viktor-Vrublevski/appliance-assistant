@@ -50,7 +50,7 @@ class UserChatHolderTest {
     void testGetMessagesWhenUserDoesNotExistShouldReturnNull() {
         List<ChatMessageDto> messages = UserChatHolder.getMessages("NonExistentUser");
 
-        assertThat(messages).isNull();
+        assertThat(messages).isEmpty();
     }
 
     @Test
@@ -61,7 +61,7 @@ class UserChatHolderTest {
 
         UserChatHolder.clear(USER_ALICE);
 
-        assertThat(UserChatHolder.getMessages(USER_ALICE)).isNull();
+        assertThat(UserChatHolder.getMessages(USER_ALICE)).isEmpty();
         assertThat(UserChatHolder.getMessages(USER_BOB)).isNotNull().hasSize(1);
     }
 
