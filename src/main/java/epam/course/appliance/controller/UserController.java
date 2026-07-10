@@ -27,26 +27,26 @@ public class UserController {
         }
         return "create_user";
     }
-
     @PostMapping("/create")
     public String createUser(@RequestParam("username") String username,
                              @RequestParam("userName") String userName,
                              @RequestParam("userAddress") String userAddress,
-                             RedirectAttributes redirectAttributes) {
+                             Model model) {
         try {
             User user = new User();
             user.setUsername(username);
             user.setUserFullName(userName);
             user.setAddress(userAddress);
-
-            boolean successMessage = userService.saveUser(user);
-            redirectAttributes.addFlashAttribute("successMessage",
-                    successMessage ? String.format("User '%s' saved successfully.", userName)
-                            : String.format("Failed to save user '%s'.", username));
-            return "redirect:/create_user";
+            boolean isSaved = userService.saveUser(user);
+            if (isSaved) {
+                model.addAttribute("successMessage", String.format("User '%s' saved successfully.", userName));
+            } else {
+                model.addAttribute("errorMessage", String.format("Failed to save user '%s' the username already exists.", username));
+            }
+            return "create_user";
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("successMessage", "An error occurred while saving the user.");
-            return "redirect:/create_user";
+            model.addAttribute("errorMessage", "An error occurred while saving the user.");
+            return "create_user";
         }
     }
 }

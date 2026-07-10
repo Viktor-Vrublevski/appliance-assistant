@@ -42,21 +42,35 @@ class UserServiceTest {
 
     @Test
     void saveUserReturnsTrueWhenRepositorySucceeds() {
+        when(userRepository.existsById("jdoe")).thenReturn(false);
         when(userRepository.save(user)).thenReturn(user);
 
         boolean result = userService.saveUser(user);
 
         assertTrue(result);
+        verify(userRepository).existsById("jdoe");
         verify(userRepository).save(user);
     }
 
     @Test
+    void saveUserReturnsFalseWhenUserAlreadyExists() {
+        when(userRepository.existsById("jdoe")).thenReturn(true);
+
+        boolean result = userService.saveUser(user);
+
+        assertFalse(result);
+        verify(userRepository).existsById("jdoe");
+    }
+
+    @Test
     void saveUserReturnsFalseWhenRepositoryThrows() {
+        when(userRepository.existsById("jdoe")).thenReturn(false);
         doThrow(new RuntimeException("db down")).when(userRepository).save(any(User.class));
 
         boolean result = userService.saveUser(user);
 
         assertFalse(result);
+        verify(userRepository).existsById("jdoe");
         verify(userRepository).save(user);
     }
 
