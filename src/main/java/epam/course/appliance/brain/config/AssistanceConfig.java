@@ -1,6 +1,5 @@
 package epam.course.appliance.brain.config;
 
-import java.io.IOException;
 import org.springframework.ai.anthropic.AnthropicChatOptions;
 import org.springframework.ai.anthropic.api.AnthropicCacheOptions;
 import org.springframework.ai.anthropic.api.AnthropicCacheStrategy;
@@ -21,11 +20,23 @@ import org.springframework.core.io.Resource;
 public class AssistanceConfig {
 
     @Bean
-    public ChatClient applianceChatClient(ChatClient.Builder builder,
-                                          ChatOptions anthropicChatOptions,
-                                          MessageChatMemoryAdvisor messageChatMemoryAdvisor,
-                                          QuestionAnswerAdvisor questionAnswerAdvisor,
-                                          @Value("classpath:system-prompt.xml") Resource resource) throws IOException {
+    public ChatClient chatClient(ChatClient.Builder builder,
+                                 ChatOptions anthropicChatOptions,
+                                 MessageChatMemoryAdvisor messageChatMemoryAdvisor,
+                                 @Value("classpath:system-prompt.xml") Resource resource) {
+        return builder
+                .defaultSystem(resource)
+                .defaultAdvisors(messageChatMemoryAdvisor)
+                .defaultOptions(anthropicChatOptions)
+                .build();
+    }
+
+    @Bean
+    public ChatClient ragChatClient(ChatClient.Builder builder,
+                                    ChatOptions anthropicChatOptions,
+                                    MessageChatMemoryAdvisor messageChatMemoryAdvisor,
+                                    QuestionAnswerAdvisor questionAnswerAdvisor,
+                                    @Value("classpath:system-prompt.xml") Resource resource) {
         return builder
                 .defaultSystem(resource)
                 .defaultAdvisors(messageChatMemoryAdvisor, questionAnswerAdvisor)
