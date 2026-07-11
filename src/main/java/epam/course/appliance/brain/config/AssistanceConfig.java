@@ -1,15 +1,17 @@
 package epam.course.appliance.brain.config;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import org.springframework.ai.anthropic.AnthropicChatOptions;
 import org.springframework.ai.anthropic.api.AnthropicCacheOptions;
 import org.springframework.ai.anthropic.api.AnthropicCacheStrategy;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
+import org.springframework.ai.chat.prompt.ChatOptions;
+import org.springframework.ai.chroma.vectorstore.ChromaVectorStore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,18 +22,33 @@ public class AssistanceConfig {
 
     @Bean
     public ChatClient applianceChatClient(ChatClient.Builder builder,
-                                          ChatMemory assistantChatMemory,
+                                          ChatOptions anthropicChatOptions,
+                                          MessageChatMemoryAdvisor messageChatMemoryAdvisor,
+                                          QuestionAnswerAdvisor questionAnswerAdvisor,
                                           @Value("classpath:system-prompt.xml") Resource resource) throws IOException {
-        String systemPrompt = resource.getContentAsString(StandardCharsets.UTF_8);
-        AnthropicChatOptions chatOptions = AnthropicChatOptions.builder()
+        return builder
+                .defaultSystem(resource)
+                .defaultAdvisors(messageChatMemoryAdvisor, questionAnswerAdvisor)
+                .defaultOptions(anthropicChatOptions)
+                .build();
+    }
+
+    @Bean
+    public MessageChatMemoryAdvisor messageChatMemoryAdvisor(ChatMemory assistantChatMemory) {
+        return MessageChatMemoryAdvisor.builder(assistantChatMemory).build();
+    }
+
+    @Bean
+    public QuestionAnswerAdvisor questionAnswerAdvisor(ChromaVectorStore chromaVectorStore) {
+        return QuestionAnswerAdvisor.builder(chromaVectorStore).build();
+    }
+
+    @Bean
+    public ChatOptions anthropicChatOptions() {
+        return AnthropicChatOptions.builder()
                 .cacheOptions(AnthropicCacheOptions.builder()
                         .strategy(AnthropicCacheStrategy.SYSTEM_AND_TOOLS)
                         .build())
-                .build();
-        return builder
-                .defaultSystem(systemPrompt)
-                .defaultAdvisors(MessageChatMemoryAdvisor.builder(assistantChatMemory).build())
-                .defaultOptions(chatOptions)
                 .build();
     }
 
