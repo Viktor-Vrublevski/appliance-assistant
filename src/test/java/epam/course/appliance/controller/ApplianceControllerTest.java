@@ -1,6 +1,8 @@
 package epam.course.appliance.controller;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -28,6 +30,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.multipart.MultipartFile;
 
 @ExtendWith(MockitoExtension.class)
 class ApplianceControllerTest {
@@ -39,6 +42,9 @@ class ApplianceControllerTest {
 
     @Mock
     private UserService userService;
+
+    @Mock
+    private epam.course.appliance.brain.service.VectorStorageService vectorStorageService;
 
     @InjectMocks
     private ApplianceController applianceController;
@@ -82,6 +88,7 @@ class ApplianceControllerTest {
 
         when(userService.getUserById("john_doe")).thenReturn(mockUser);
         when(applianceService.saveAppliance(any(Appliance.class))).thenReturn(true);
+        doNothing().when(vectorStorageService).processPdfAndSave(any(MultipartFile.class));
 
         mockMvc.perform(multipart("/appliances/v1/create")
                         .file(mockFile)
@@ -97,6 +104,7 @@ class ApplianceControllerTest {
                 .andExpect(flash().attribute("successMessage", "Appliance 'Refrigerator' saved successfully."));
 
         verify(applianceService, times(1)).saveAppliance(any(Appliance.class));
+        verify(vectorStorageService, times(1)).processPdfAndSave(any(MultipartFile.class));
     }
 
     @Test
@@ -107,6 +115,7 @@ class ApplianceControllerTest {
 
         when(userService.getUserById("john_doe")).thenReturn(new User());
         when(applianceService.saveAppliance(any(Appliance.class))).thenReturn(false);
+        doNothing().when(vectorStorageService).processPdfAndSave(any(MultipartFile.class));
 
         mockMvc.perform(multipart("/appliances/v1/create")
                         .file(mockFile)
@@ -142,5 +151,35 @@ class ApplianceControllerTest {
                 .andExpect(flash().attribute("successMessage", "Operation failed!"));
 
         verifyNoInteractions(applianceService);
+        verifyNoInteractions(vectorStorageService);
+    }
+
+    @Test
+    void testProvisionApplianceVectorStorageExceptionTriggersFailure() throws Exception {
+        MockMultipartFile mockFile = new MockMultipartFile(
+                "manualFile", "manual.pdf", "application/pdf", "content".getBytes()
+        );
+        User mockUser = new User();
+
+        when(userService.getUserById("john_doe")).thenReturn(mockUser);
+        when(applianceService.saveAppliance(any(Appliance.class))).thenReturn(true);
+        doThrow(new RuntimeException("Vector storage failed"))
+                .when(vectorStorageService).processPdfAndSave(any(MultipartFile.class));
+
+        mockMvc.perform(multipart("/appliances/v1/create")
+                        .file(mockFile)
+                        .param("serialNumber", "SN12345")
+                        .param("category", "Dishwasher")
+                        .param("modelNumber", "MOD-66")
+                        .param("modelName", "WashPro")
+                        .param("manufactureDate", "2026-01-01")
+                        .param("warrantyExpiryDate", "2027-01-01")
+                        .param("ownerUsername", "john_doe"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/create_appliance"))
+                .andExpect(flash().attribute("successMessage", "Operation failed!"));
+
+        verify(applianceService, times(1)).saveAppliance(any(Appliance.class));
+        verify(vectorStorageService, times(1)).processPdfAndSave(any(MultipartFile.class));
     }
 }

@@ -1,5 +1,6 @@
 package epam.course.appliance.controller;
 
+import epam.course.appliance.brain.service.VectorStorageService;
 import epam.course.appliance.entity.Appliance;
 import epam.course.appliance.service.ApplianceService;
 import epam.course.appliance.service.UserService;
@@ -19,10 +20,14 @@ public class ApplianceController {
 
     private final ApplianceService applianceService;
     private final UserService userService;
+    private final VectorStorageService vectorStorageService;
 
-    public ApplianceController(ApplianceService applianceService, UserService userService) {
+    public ApplianceController(ApplianceService applianceService,
+                               UserService userService,
+                               VectorStorageService vectorStorageService) {
         this.applianceService = applianceService;
         this.userService = userService;
+        this.vectorStorageService = vectorStorageService;
     }
 
     @GetMapping("/create-view")
@@ -56,6 +61,7 @@ public class ApplianceController {
             appliance.setWarrantyExpiryDate(LocalDate.parse(warrantyExpiryStr));
             appliance.setOwner(userService.getUserById(username));
             boolean successMessage = applianceService.saveAppliance(appliance);
+            vectorStorageService.processPdfAndSave(manualFile);
             redirectAttributes.addFlashAttribute("successMessage",
                     successMessage ? String.format("Appliance '%s' saved successfully.", category)
                             : String.format("Failed to save appliance '%s'.", category));
