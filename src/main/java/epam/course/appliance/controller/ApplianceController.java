@@ -1,5 +1,6 @@
 package epam.course.appliance.controller;
 
+import epam.course.appliance.brain.service.VectorStorageService;
 import epam.course.appliance.entity.Appliance;
 import epam.course.appliance.service.ApplianceService;
 import epam.course.appliance.service.UserService;
@@ -19,10 +20,14 @@ public class ApplianceController {
 
     private final ApplianceService applianceService;
     private final UserService userService;
+    private final VectorStorageService vectorStorageService;
 
-    public ApplianceController(ApplianceService applianceService, UserService userService) {
+    public ApplianceController(ApplianceService applianceService,
+                               UserService userService,
+                               VectorStorageService vectorStorageService) {
         this.applianceService = applianceService;
         this.userService = userService;
+        this.vectorStorageService = vectorStorageService;
     }
 
     @GetMapping("/create-view")
@@ -45,7 +50,7 @@ public class ApplianceController {
                                      @RequestParam(value = "warrantyExpiryDate", required = false) String warrantyExpiryStr,
                                      @RequestParam("ownerUsername") String username,
                                      @RequestParam("manualFile") MultipartFile manualFile,
-                                     RedirectAttributes redirectAttributes) {
+                                     Model model) {
         try {
             Appliance appliance = new Appliance();
             appliance.setSerialNumber(serialNumber);
@@ -56,13 +61,14 @@ public class ApplianceController {
             appliance.setWarrantyExpiryDate(LocalDate.parse(warrantyExpiryStr));
             appliance.setOwner(userService.getUserById(username));
             boolean successMessage = applianceService.saveAppliance(appliance);
-            redirectAttributes.addFlashAttribute("successMessage",
+            vectorStorageService.processPdfAndSave(manualFile, category, serialNumber, modelNumber);
+            model.addAttribute("successMessage",
                     successMessage ? String.format("Appliance '%s' saved successfully.", category)
                             : String.format("Failed to save appliance '%s'.", category));
-            return "redirect:/create_appliance";
+            return "create_appliance";
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("successMessage", "Operation failed!");
-            return "redirect:/create_appliance";
+            model.addAttribute("successMessage", "Operation failed!");
+            return "create_appliance";
         }
     }
 }
