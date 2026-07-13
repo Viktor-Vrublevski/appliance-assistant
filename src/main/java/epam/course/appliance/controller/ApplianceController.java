@@ -50,7 +50,7 @@ public class ApplianceController {
                                      @RequestParam(value = "warrantyExpiryDate", required = false) String warrantyExpiryStr,
                                      @RequestParam("ownerUsername") String username,
                                      @RequestParam("manualFile") MultipartFile manualFile,
-                                     RedirectAttributes redirectAttributes) {
+                                     Model model) {
         try {
             Appliance appliance = new Appliance();
             appliance.setSerialNumber(serialNumber);
@@ -62,13 +62,13 @@ public class ApplianceController {
             appliance.setOwner(userService.getUserById(username));
             boolean successMessage = applianceService.saveAppliance(appliance);
             vectorStorageService.processPdfAndSave(manualFile, category, serialNumber, modelNumber);
-            redirectAttributes.addFlashAttribute("successMessage",
+            model.addAttribute("successMessage",
                     successMessage ? String.format("Appliance '%s' saved successfully.", category)
                             : String.format("Failed to save appliance '%s'.", category));
-            return "redirect:/create_appliance";
+            return "create_appliance";
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("successMessage", "Operation failed!");
-            return "redirect:/create_appliance";
+            model.addAttribute("successMessage", "Operation failed!");
+            return "create_appliance";
         }
     }
 }
