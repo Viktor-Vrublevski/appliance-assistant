@@ -3,6 +3,7 @@ package epam.course.appliance.brain.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.springframework.ai.chat.memory.ChatMemory.CONVERSATION_ID;
@@ -50,6 +51,7 @@ class AssistantServiceTest {
         doReturn(requestSpec).when(applianceChatClient).prompt();
         doReturn(requestSpec).when(requestSpec).messages(any(UserMessage.class));
         doReturn(requestSpec).when(requestSpec).advisors(any(Consumer.class));
+        doReturn(requestSpec).when(requestSpec).toolContext(anyMap());
         doReturn(responseSpec).when(requestSpec).call();
         doReturn(expectedChatResponse).when(responseSpec).chatResponse();
     }

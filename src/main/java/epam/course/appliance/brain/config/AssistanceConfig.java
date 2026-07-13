@@ -1,5 +1,6 @@
 package epam.course.appliance.brain.config;
 
+import epam.course.appliance.brain.tool.FetchApplianceDataTool;
 import org.springframework.ai.anthropic.AnthropicChatOptions;
 import org.springframework.ai.anthropic.api.AnthropicCacheOptions;
 import org.springframework.ai.anthropic.api.AnthropicCacheStrategy;
@@ -23,11 +24,13 @@ public class AssistanceConfig {
     public ChatClient chatClient(ChatClient.Builder builder,
                                  ChatOptions anthropicChatOptions,
                                  MessageChatMemoryAdvisor messageChatMemoryAdvisor,
+                                 FetchApplianceDataTool applianceDataTool,
                                  @Value("classpath:system-prompt.xml") Resource resource) {
         return builder
                 .defaultSystem(resource)
                 .defaultAdvisors(messageChatMemoryAdvisor)
                 .defaultOptions(anthropicChatOptions)
+                .defaultTools(applianceDataTool)
                 .build();
     }
 

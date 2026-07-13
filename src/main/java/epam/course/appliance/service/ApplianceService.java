@@ -2,6 +2,7 @@ package epam.course.appliance.service;
 
 import epam.course.appliance.entity.Appliance;
 import epam.course.appliance.repository.ApplianceRepository;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,7 @@ public class ApplianceService {
         }
     }
     
-    public Appliance getApplianceById(String id) {
-        return applianceRepository.findById(id).orElse(null);
+    public List<Appliance> getApplianceByUsername(String id) {
+        return applianceRepository.findByOwner_Username(id);
     }
 }

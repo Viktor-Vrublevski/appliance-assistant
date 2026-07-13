@@ -90,4 +90,17 @@ public class Appliance {
     public void setOwner(User owner) {
         this.owner = owner;
     }
+
+    @Override
+    public String toString() {
+        return String.format("""
+                Serial Number: %s
+                Category: %s
+                Model Number: %s
+                Model Name: %s
+                Manufacture Date: %s
+                Warranty Expiry Date: %s
+                """,
+                serialNumber, category, modelNumber, modelName, manufactureDate, warrantyExpiryDate);
+    }
 }

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Assistant Chat</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         .chat-container::-webkit-scrollbar {
             width: 6px;
@@ -17,6 +18,14 @@
         .chat-container::-webkit-scrollbar-thumb {
             background-color: #cbd5e1;
             border-radius: 3px;
+        }
+
+        /* Cleans up spacing quirks caused by markdown paragraph breaks inside chat bubbles */
+        .markdown-content p {
+            margin-bottom: 0.5rem;
+        }
+        .markdown-content p:last-child {
+            margin-bottom: 0;
         }
     </style>
 </head>
@@ -62,8 +71,7 @@
 
         <div th:if="${msg.sender == 'USER'}" class="flex justify-end mb-2 pl-12">
             <div class="bg-indigo-600 text-white rounded-2xl rounded-tr-none px-4 py-2.5 shadow-sm max-w-xl">
-                <p class="text-sm leading-relaxed whitespace-pre-wrap" th:text="${msg.content}">User prompt message text
-                    goes here.</p>
+                <p class="text-sm leading-relaxed whitespace-pre-wrap" th:text="${msg.content}">User prompt message text goes here.</p>
                 <span class="block text-[10px] text-indigo-200 mt-1 text-right"
                       th:text="${#temporals.format(msg.timestamp, 'HH:mm')}">10:42</span>
             </div>
@@ -74,8 +82,9 @@
                 <div class="flex items-center space-x-1 mb-1 text-xs text-slate-400 font-semibold">
                     <span>AI Assistant</span>
                 </div>
-                <p class="text-sm leading-relaxed whitespace-pre-wrap text-slate-700" th:text="${msg.content}">AI
-                    structural response goes here.</p>
+                <div class="markdown-content text-sm leading-relaxed text-slate-700" th:utext="${msg.content}">
+                    AI structural response goes here.
+                </div>
                 <span class="block text-[10px] text-slate-400 mt-1"
                       th:text="${#temporals.format(msg.timestamp, 'HH:mm')}">10:43</span>
             </div>
@@ -110,7 +119,6 @@
         </form>
     </div>
 </footer>
-
 <script>
     const container = document.querySelector('.chat-container');
     if (container) {
@@ -118,6 +126,19 @@
     }
 </script>
 <script>
+    marked.setOptions({
+        gfm: true,
+        breaks: true
+    });
+    function renderMarkdown() {
+        document.querySelectorAll('.markdown-content').forEach(el => {
+            if (!el.classList.contains('markdown-parsed')) {
+                el.innerHTML = marked.parse(el.textContent || el.innerText);
+                el.classList.add('markdown-parsed');
+            }
+        });
+    }
+    document.addEventListener("DOMContentLoaded", renderMarkdown);
     document.getElementById('chatForm').addEventListener('submit', function(e) {
         e.preventDefault();
         const input = document.getElementById('messageInput');
@@ -166,13 +187,14 @@
             .then(html => {
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
-                const newHistory = doc.querySelector('.chat-container').innerHTML;
-                container.innerHTML = newHistory;
+                container.innerHTML = doc.querySelector('.chat-container').innerHTML;
+                renderMarkdown();
                 container.scrollTop = container.scrollHeight;
             })
             .catch(err => {
                 console.error(err);
-                document.getElementById('ai-loading').remove();
+                const loader = document.getElementById('ai-loading');
+                if (loader) loader.remove();
             });
     });
     function escapeHtml(text) {

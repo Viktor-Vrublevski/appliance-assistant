@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 
 import epam.course.appliance.entity.Appliance;
 import epam.course.appliance.repository.ApplianceRepository;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -61,21 +62,21 @@ class ApplianceServiceTest {
 
     @Test
     void getApplianceByIdReturnsApplianceWhenFound() {
-        when(applianceRepository.findById("SN-123")).thenReturn(Optional.of(appliance));
+        when(applianceRepository.findByOwner_Username("SN-123")).thenReturn(List.of(appliance));
 
-        Appliance result = applianceService.getApplianceById("SN-123");
+        List<Appliance> result = applianceService.getApplianceByUsername("SN-123");
 
-        assertSame(appliance, result);
-        verify(applianceRepository).findById("SN-123");
+        assertSame(appliance, result.getFirst());
+        verify(applianceRepository).findByOwner_Username("SN-123");
     }
 
     @Test
-    void getApplianceByIdReturnsNullWhenNotFound() {
-        when(applianceRepository.findById("missing")).thenReturn(Optional.empty());
+    void getApplianceByUsernameReturnsNullWhenNotFound() {
+        when(applianceRepository.findByOwner_Username("missing")).thenReturn(List.of());
 
-        Appliance result = applianceService.getApplianceById("missing");
+        List<Appliance> result = applianceService.getApplianceByUsername("missing");
 
-        assertNull(result);
-        verify(applianceRepository).findById("missing");
+        assertTrue(result.isEmpty());
+        verify(applianceRepository).findByOwner_Username("missing");
     }
 }

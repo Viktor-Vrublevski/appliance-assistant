@@ -10,7 +10,9 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
@@ -99,9 +101,9 @@ class ApplianceControllerTest {
                         .param("manufactureDate", "2026-01-01")
                         .param("warrantyExpiryDate", "2028-01-01")
                         .param("ownerUsername", "john_doe"))
-                .andExpect(status().is2xxSuccessful())
-                .andExpect(view().name("create_appliance"))
-                .andExpect(model().attribute("successMessage", "Appliance 'Refrigerator' saved successfully."));
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/appliances/v1/create-view"))
+                .andExpect(flash().attribute("successMessage", "Appliance 'Refrigerator' saved successfully."));
 
         verify(applianceService, times(1)).saveAppliance(any(Appliance.class));
         verify(vectorStorageService, times(1))
@@ -128,9 +130,9 @@ class ApplianceControllerTest {
                         .param("manufactureDate", "2026-01-01")
                         .param("warrantyExpiryDate", "2027-01-01")
                         .param("ownerUsername", "john_doe"))
-                .andExpect(status().is2xxSuccessful())
-                .andExpect(view().name("create_appliance"))
-                .andExpect(model().attribute("successMessage", "Failed to save appliance 'Microwave'."));
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/appliances/v1/create-view"))
+                .andExpect(flash().attribute("successMessage", "Failed to save appliance 'Microwave'."));
     }
 
     @Test
@@ -148,9 +150,9 @@ class ApplianceControllerTest {
                         .param("manufactureDate", "invalid-date-format")
                         .param("warrantyExpiryDate", "2027-01-01")
                         .param("ownerUsername", "john_doe"))
-                .andExpect(status().is2xxSuccessful())
-                .andExpect(view().name("create_appliance"))
-                .andExpect(model().attribute("successMessage", "Operation failed!"));
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/appliances/v1/create-view"))
+                .andExpect(flash().attribute("errorMessage", "Operation failed!"));
 
         verifyNoInteractions(applianceService);
         verifyNoInteractions(vectorStorageService);
@@ -178,12 +180,37 @@ class ApplianceControllerTest {
                         .param("manufactureDate", "2026-01-01")
                         .param("warrantyExpiryDate", "2027-01-01")
                         .param("ownerUsername", "john_doe"))
-                .andExpect(status().is2xxSuccessful())
-                .andExpect(view().name("create_appliance"))
-                .andExpect(model().attribute("successMessage", "Operation failed!"));
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/appliances/v1/create-view"))
+                .andExpect(flash().attribute("errorMessage", "Operation failed!"));
 
         verify(applianceService, times(1)).saveAppliance(any(Appliance.class));
         verify(vectorStorageService, times(1))
                 .processPdfAndSave(any(MultipartFile.class), anyString(), anyString(), anyString());
     }
+
+    @Test
+    void testProvisionApplianceWhenMultipartFileIsEmptyReturnsErrorMessage() throws Exception {
+        MockMultipartFile emptyFile = new MockMultipartFile(
+                "manualFile", "manual.pdf", "application/pdf", new byte[0]
+        );
+
+        mockMvc.perform(multipart("/appliances/v1/create")
+                        .file(emptyFile)
+                        .param("serialNumber", "SN12345")
+                        .param("category", "Refrigerator")
+                        .param("modelNumber", "MOD-99")
+                        .param("modelName", "CoolFreeze")
+                        .param("manufactureDate", "2026-01-01")
+                        .param("warrantyExpiryDate", "2028-01-01")
+                        .param("ownerUsername", "john_doe"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/appliances/v1/create-view"))
+                .andExpect(flash().attribute("errorMessage", "Manual file is required!"));
+
+        verifyNoInteractions(userService);
+        verifyNoInteractions(applianceService);
+        verifyNoInteractions(vectorStorageService);
+    }
 }
+
