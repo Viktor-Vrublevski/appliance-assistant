@@ -9,6 +9,12 @@ public class ApplianceConfig {
 
     @Bean
     public TokenTextSplitter tokenTextSplitter() {
-        return new TokenTextSplitter();
+        return TokenTextSplitter.builder()
+                .withChunkSize(600)
+                .withMinChunkSizeChars(800)
+                .withMinChunkLengthToEmbed(5)
+                .withMaxNumChunks(10000)
+                .withKeepSeparator(true)
+                .build();
     }
 }

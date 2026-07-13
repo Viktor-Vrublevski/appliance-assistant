@@ -1,6 +1,7 @@
 package epam.course.appliance.controller;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
@@ -88,7 +89,8 @@ class ApplianceControllerTest {
 
         when(userService.getUserById("john_doe")).thenReturn(mockUser);
         when(applianceService.saveAppliance(any(Appliance.class))).thenReturn(true);
-        doNothing().when(vectorStorageService).processPdfAndSave(any(MultipartFile.class));
+        doNothing().when(vectorStorageService).processPdfAndSave(any(MultipartFile.class), anyString(),
+                anyString(), anyString());
 
         mockMvc.perform(multipart("/appliances/v1/create")
                         .file(mockFile)
@@ -104,7 +106,8 @@ class ApplianceControllerTest {
                 .andExpect(flash().attribute("successMessage", "Appliance 'Refrigerator' saved successfully."));
 
         verify(applianceService, times(1)).saveAppliance(any(Appliance.class));
-        verify(vectorStorageService, times(1)).processPdfAndSave(any(MultipartFile.class));
+        verify(vectorStorageService, times(1))
+                .processPdfAndSave(any(MultipartFile.class), anyString(), anyString(), anyString()  );
     }
 
     @Test
@@ -115,7 +118,8 @@ class ApplianceControllerTest {
 
         when(userService.getUserById("john_doe")).thenReturn(new User());
         when(applianceService.saveAppliance(any(Appliance.class))).thenReturn(false);
-        doNothing().when(vectorStorageService).processPdfAndSave(any(MultipartFile.class));
+        doNothing().when(vectorStorageService)
+                .processPdfAndSave(any(MultipartFile.class), anyString(), anyString(), anyString());
 
         mockMvc.perform(multipart("/appliances/v1/create")
                         .file(mockFile)
@@ -164,7 +168,8 @@ class ApplianceControllerTest {
         when(userService.getUserById("john_doe")).thenReturn(mockUser);
         when(applianceService.saveAppliance(any(Appliance.class))).thenReturn(true);
         doThrow(new RuntimeException("Vector storage failed"))
-                .when(vectorStorageService).processPdfAndSave(any(MultipartFile.class));
+                .when(vectorStorageService)
+                .processPdfAndSave(any(MultipartFile.class), anyString(), anyString(), anyString());
 
         mockMvc.perform(multipart("/appliances/v1/create")
                         .file(mockFile)
@@ -180,6 +185,7 @@ class ApplianceControllerTest {
                 .andExpect(flash().attribute("successMessage", "Operation failed!"));
 
         verify(applianceService, times(1)).saveAppliance(any(Appliance.class));
-        verify(vectorStorageService, times(1)).processPdfAndSave(any(MultipartFile.class));
+        verify(vectorStorageService, times(1))
+                .processPdfAndSave(any(MultipartFile.class), anyString(), anyString(), anyString());
     }
 }

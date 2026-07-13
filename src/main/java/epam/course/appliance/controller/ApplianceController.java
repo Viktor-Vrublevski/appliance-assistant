@@ -61,7 +61,7 @@ public class ApplianceController {
             appliance.setWarrantyExpiryDate(LocalDate.parse(warrantyExpiryStr));
             appliance.setOwner(userService.getUserById(username));
             boolean successMessage = applianceService.saveAppliance(appliance);
-            vectorStorageService.processPdfAndSave(manualFile);
+            vectorStorageService.processPdfAndSave(manualFile, category, serialNumber, modelNumber);
             redirectAttributes.addFlashAttribute("successMessage",
                     successMessage ? String.format("Appliance '%s' saved successfully.", category)
                             : String.format("Failed to save appliance '%s'.", category));

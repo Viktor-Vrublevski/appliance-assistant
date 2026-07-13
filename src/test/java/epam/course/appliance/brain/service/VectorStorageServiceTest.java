@@ -30,6 +30,10 @@ import org.springframework.web.multipart.MultipartFile;
 @ExtendWith(MockitoExtension.class)
 class VectorStorageServiceTest {
 
+    private static final String APPLIANCE_CATEGORY = "TV set";
+    private static final String APPLIANCE_SERIAL_NUMBER = "12345";
+    private static final String APPLIANCE_MODEL_NUMBER = "TXS-123";
+
     @Mock
     private ChromaVectorStore vectorStore;
 
@@ -67,7 +71,8 @@ class VectorStorageServiceTest {
                     when(mock.get()).thenReturn(rawDocsFromReader);
                 })) {
 
-            vectorStorageService.processPdfAndSave(multipartFile);
+            vectorStorageService.processPdfAndSave(multipartFile, APPLIANCE_CATEGORY,
+                    APPLIANCE_SERIAL_NUMBER, APPLIANCE_MODEL_NUMBER);
 
             ArgumentCaptor<List<Document>> rawDocsCaptor = ArgumentCaptor.forClass(List.class);
             verify(textSplitter).apply(rawDocsCaptor.capture());
@@ -87,7 +92,8 @@ class VectorStorageServiceTest {
         when(multipartFile.getBytes()).thenThrow(new IOException("Disk read failure"));
 
         assertThrows(IOException.class, () -> {
-            vectorStorageService.processPdfAndSave(multipartFile);
+            vectorStorageService.processPdfAndSave(multipartFile, APPLIANCE_CATEGORY,
+                    APPLIANCE_SERIAL_NUMBER, APPLIANCE_MODEL_NUMBER);
         });
 
         verifyNoInteractions(textSplitter);

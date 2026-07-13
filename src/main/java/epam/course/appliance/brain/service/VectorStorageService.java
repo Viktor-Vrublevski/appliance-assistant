@@ -1,6 +1,8 @@
 package epam.course.appliance.brain.service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import javax.validation.constraints.NotNull;
 import org.springframework.ai.chroma.vectorstore.ChromaVectorStore;
 import org.springframework.ai.document.Document;
@@ -26,17 +28,28 @@ public class VectorStorageService {
         this.textSplitter = textSplitter;
     }
 
-    public void processPdfAndSave(@NotNull MultipartFile file) throws Exception {
+    public void processPdfAndSave(@NotNull MultipartFile file,
+                                  String category,
+                                  String serialNumber,
+                                  String modelNumber) throws Exception {
         Resource resource = new ByteArrayResource(file.getBytes());
 
         PdfDocumentReaderConfig config = PdfDocumentReaderConfig.builder().build();
         PagePdfDocumentReader pdfReader = new PagePdfDocumentReader(resource, config);
         List<Document> rawDocuments = pdfReader.get();
 
-        rawDocuments.forEach(doc -> doc.getMetadata()
-                .put("filename", file.getOriginalFilename()));
+        List<Document> documents = rawDocuments.stream().map(doc -> {
+            String enrichedText = String.format("Appliance: %s\n Serial Number: %s\n Model Number: %s\n %s",
+                    category, serialNumber, modelNumber, doc.getText());
+            return new Document(enrichedText, Map.of(
+                    "appliance", category,
+                    "serial-number", serialNumber,
+                    "model-number", modelNumber,
+                    "filename", Objects.requireNonNull(file.getOriginalFilename())
+            ));
+        }).toList();
 
-        List<Document> splitDocuments = textSplitter.apply(rawDocuments);
+        List<Document> splitDocuments = textSplitter.apply(documents);
         vectorStore.add(splitDocuments);
     }
 }
