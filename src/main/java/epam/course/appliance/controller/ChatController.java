@@ -40,8 +40,7 @@ public class ChatController {
 
     @PostMapping("/chat/send")
     public String sendMessage(@RequestParam("message") String message,
-                              HttpSession session,
-                              Model model) {
+                              HttpSession session) {
         if (message == null || message.trim().isEmpty()) {
             return "redirect:/chat-view";
         }

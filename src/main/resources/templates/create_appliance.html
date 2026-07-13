@@ -10,14 +10,20 @@
 
 <main class="max-w-2xl mx-auto p-6 md:p-12">
     <div class="mb-6">
-        <a th:href="@{/main}" class="text-sm font-medium text-slate-500 hover:text-slate-800 flex items-center space-x-1">
+        <a th:href="@{/main}"
+           class="text-sm font-medium text-slate-500 hover:text-slate-800 flex items-center space-x-1">
             <span>&larr;</span> <span>Back to Dashboard</span>
         </a>
         <!--/*@thymesVar id="successMessage" type=""*/-->
         <div th:if="${successMessage}"
-             class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-sm"
+             class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-sm mb-4"
              th:text="${successMessage}">
             Operation completed successfully!
+        </div>
+        <div th:if="${errorMessage}"
+             class="p-4 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl text-sm mb-4"
+             th:text="${errorMessage}">
+            Operation failed!
         </div>
     </div>
 

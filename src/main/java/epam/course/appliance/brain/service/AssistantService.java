@@ -1,7 +1,9 @@
 package epam.course.appliance.brain.service;
 
+import static epam.course.appliance.ApplianceConstant.KEY_CONVERSATION_ID;
 import static org.springframework.ai.chat.memory.ChatMemory.CONVERSATION_ID;
 
+import java.util.Map;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -22,6 +24,7 @@ public class AssistantService {
                 .build();
         return chatClient.prompt()
                 .messages(userMessage)
+                .toolContext(Map.of(KEY_CONVERSATION_ID, conversationId))
                 .advisors(advisorSpec -> advisorSpec.param(CONVERSATION_ID, conversationId))
                 .call()
                 .chatResponse();
