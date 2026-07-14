@@ -12,6 +12,7 @@ import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.ai.chroma.vectorstore.ChromaVectorStore;
+import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -54,12 +55,19 @@ public class AssistanceConfig {
 
     @Bean
     public QuestionAnswerAdvisor questionAnswerAdvisor(ChromaVectorStore chromaVectorStore) {
-        return QuestionAnswerAdvisor.builder(chromaVectorStore).build();
+        SearchRequest searchRequest = SearchRequest.builder()
+                .topK(3)
+                .similarityThreshold(0.5)
+                .build();
+        return QuestionAnswerAdvisor.builder(chromaVectorStore)
+                .searchRequest(searchRequest)
+                .build();
     }
 
     @Bean
     public ChatOptions anthropicChatOptions() {
         return AnthropicChatOptions.builder()
+                .temperature(0.6)
                 .cacheOptions(AnthropicCacheOptions.builder()
                         .strategy(AnthropicCacheStrategy.SYSTEM_AND_TOOLS)
                         .build())
