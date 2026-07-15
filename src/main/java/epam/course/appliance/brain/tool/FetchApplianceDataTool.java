@@ -1,6 +1,7 @@
 package epam.course.appliance.brain.tool;
 
 import static epam.course.appliance.ApplianceConstant.KEY_CONVERSATION_ID;
+import static epam.course.appliance.ApplianceConstant.KEY_USERNAME;
 import static epam.course.appliance.brain.tool.prompt.FetchAppliancePrompt.FETCH_APPLIANCE_PROMPT;
 import static org.springframework.ai.chat.memory.ChatMemory.CONVERSATION_ID;
 
@@ -36,7 +37,8 @@ public class FetchApplianceDataTool {
     }
 
     @Tool(name = "fetchApplianceDataTool", description = FETCH_APPLIANCE_PROMPT)
-    public ChatResponse fetchApplianceData(String username, String request, ToolContext toolContext) {
+    public ChatResponse fetchApplianceData(String request, ToolContext toolContext) {
+        String username = (String) toolContext.getContext().get(KEY_USERNAME);
         List<Appliance> appliances = applianceService.getApplianceByUsername(username);
         if (appliances == null) {
             LOGGER.info("Appliance with username {} not found", username);

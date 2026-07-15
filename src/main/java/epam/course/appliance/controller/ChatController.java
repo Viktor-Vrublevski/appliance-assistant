@@ -48,7 +48,7 @@ public class ChatController {
         UserChatHolder.addMessage(userChatData.getUsername(),
                 new ChatMessageDto("USER", message, LocalDateTime.now()));
         ChatResponse chatResponse = assistantService.chat(message, UserContextHolder
-                .getUserChatData(session.getId()).getConversationId());
+                .getUserChatData(session.getId()).getConversationId(), userChatData.getUsername());
         String aiTextResponse = chatResponse.getResult().getOutput().getText();
         UserChatHolder.addMessage(userChatData.getUsername(),
                 new ChatMessageDto("AI", aiTextResponse, LocalDateTime.now()));

@@ -25,12 +25,6 @@ public class FetchAppliancePrompt {
                 </when_to_use>
                 <parameters>
                     <parameter>
-                        <name>username</name>
-                        <type>String</type>
-                        <required>true</required>
-                        <description>The user's identifier to retrieve their registered appliances</description>
-                    </parameter>
-                    <parameter>
                         <name>request</name>
                         <type>String</type>
                         <required>true</required>
