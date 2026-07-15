@@ -88,7 +88,7 @@ class ChatControllerTest {
         when(mockResponse.getResult()).thenReturn(mockGeneration);
         when(mockGeneration.getOutput()).thenReturn(mock(org.springframework.ai.chat.messages.AssistantMessage.class));
         when(mockGeneration.getOutput().getText()).thenReturn("AI response");
-        when(assistantService.chat("Hello", "conv-123")).thenReturn(mockResponse);
+        when(assistantService.chat("Hello", "conv-123", "testuser")).thenReturn(mockResponse);
 
         mockMvc.perform(post("/chat/send")
                         .param("message", "Hello")
@@ -96,7 +96,7 @@ class ChatControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/chat-view"));
 
-        verify(assistantService).chat("Hello", "conv-123");
+        verify(assistantService).chat("Hello", "conv-123", "testuser");
         List<ChatMessageDto> messages = UserChatHolder.getMessages("testuser");
         org.junit.jupiter.api.Assertions.assertEquals(2, messages.size());
         org.junit.jupiter.api.Assertions.assertEquals("USER", messages.get(0).getSender());
@@ -113,7 +113,7 @@ class ChatControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/chat-view"));
 
-        verify(assistantService, never()).chat(anyString(), anyString());
+        verify(assistantService, never()).chat(anyString(), anyString(), anyString());
     }
 
     @Test
@@ -122,7 +122,7 @@ class ChatControllerTest {
                         .session(session))
                 .andExpect(status().isBadRequest());
 
-        verify(assistantService, never()).chat(anyString(), anyString());
+        verify(assistantService, never()).chat(anyString(), anyString(), anyString());
     }
 
     @Test
@@ -133,7 +133,7 @@ class ChatControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/chat-view"));
 
-        verify(assistantService, never()).chat(anyString(), anyString());
+        verify(assistantService, never()).chat(anyString(), anyString(), anyString());
     }
 
     @Test

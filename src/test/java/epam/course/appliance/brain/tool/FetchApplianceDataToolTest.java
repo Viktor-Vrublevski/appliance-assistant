@@ -1,6 +1,7 @@
 package epam.course.appliance.brain.tool;
 
 import static epam.course.appliance.ApplianceConstant.KEY_CONVERSATION_ID;
+import static epam.course.appliance.ApplianceConstant.KEY_USERNAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -61,7 +62,9 @@ class FetchApplianceDataToolTest {
         appliance.setCategory("Refrigerator");
         List<Appliance> appliances = List.of(appliance);
         ChatResponse expectedResponse = mock(ChatResponse.class);
-        when(toolContext.getContext()).thenReturn(Map.of(KEY_CONVERSATION_ID, conversationId));
+        when(toolContext.getContext()).thenReturn(Map.of(
+                KEY_CONVERSATION_ID, conversationId,
+                KEY_USERNAME, username));
         when(applianceService.getApplianceByUsername(username)).thenReturn(appliances);
         when(ragChatClient.prompt()).thenReturn(requestSpec);
         when(requestSpec.messages(any(UserMessage.class))).thenReturn(requestSpec);
@@ -69,7 +72,7 @@ class FetchApplianceDataToolTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.chatResponse()).thenReturn(expectedResponse);
 
-        ChatResponse actualResponse = fetchApplianceDataTool.fetchApplianceData(username, request, toolContext);
+        ChatResponse actualResponse = fetchApplianceDataTool.fetchApplianceData(request, toolContext);
 
         assertNotNull(actualResponse);
         assertEquals(expectedResponse, actualResponse);
@@ -91,8 +94,9 @@ class FetchApplianceDataToolTest {
         String username = "unknownUser";
         String request = "Show my devices";
         when(applianceService.getApplianceByUsername(username)).thenReturn(null);
+        when(toolContext.getContext()).thenReturn(Map.of(KEY_USERNAME, username));
 
-        ChatResponse actualResponse = fetchApplianceDataTool.fetchApplianceData(username, request, toolContext);
+        ChatResponse actualResponse = fetchApplianceDataTool.fetchApplianceData(request, toolContext);
 
         assertNotNull(actualResponse);
         assertNotNull(actualResponse.getResults());

@@ -60,8 +60,9 @@ class AssistantServiceTest {
     void shouldSuccessfullyPassMessageAndConversationIdToChatClient() {
         String userRequest = "Hello, turn on the oven.";
         String conversationId = "test-session-123";
+        String username = "test-user";
 
-        ChatResponse actualResponse = assistantService.chat(userRequest, conversationId);
+        ChatResponse actualResponse = assistantService.chat(userRequest, conversationId, username);
 
         assertNotNull(actualResponse);
         assertEquals(expectedChatResponse, actualResponse);
