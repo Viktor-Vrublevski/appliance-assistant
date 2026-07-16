@@ -67,7 +67,8 @@ public class AssistanceConfig {
     @Bean
     public ChatOptions anthropicChatOptions() {
         return AnthropicChatOptions.builder()
-                .temperature(0.6)
+                .temperature(0.5)
+                .topK(10)
                 .cacheOptions(AnthropicCacheOptions.builder()
                         .strategy(AnthropicCacheStrategy.SYSTEM_AND_TOOLS)
                         .build())
