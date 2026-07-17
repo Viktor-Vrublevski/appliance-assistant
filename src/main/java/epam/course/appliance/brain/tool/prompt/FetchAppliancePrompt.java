@@ -11,6 +11,7 @@ public class FetchAppliancePrompt {
                 <purpose>
                     Retrieves comprehensive appliance information for a specific user and enriches it with
                     relevant documentation from the RAG vector store to provide context-aware, model-specific guidance.
+                    If user doesn't have any appliance registered, answer with "User doesn't have any appliance registered."
                 </purpose>
                 <when_to_use>
                     <scenario>User reports an appliance error, malfunction, or unexpected behavior</scenario>
@@ -24,6 +25,17 @@ public class FetchAppliancePrompt {
                     </note>
                 </when_to_use>
                 <parameters>
+                    <parameter>
+                        <name>category</name>
+                        <type>String</type>
+                        <required>true</required>
+                        <description>
+                            The category of the appliance for which the user is seeking information. This helps
+                            the RAG system retrieve relevant manual sections specific to the appliance type.
+                            Example categories include: "TV-set", "Refrigerator", "Washing Machine", "Dishwasher",
+                             "Microwave", "Oven", "Air Conditioner", "Dryer", "Vacuum Cleaner", "Coffee Maker".
+                        </description>
+                    </parameter>
                     <parameter>
                         <name>request</name>
                         <type>String</type>

@@ -54,8 +54,15 @@
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Category
                         Type*</label>
-                    <input type="text" name="category" maxlength="100" required placeholder="Reftigerator, HVAC"
-                           class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-2.5 text-sm outline-none transition"/>
+                    <select name="category" required
+                            class="w-full bg-slate-50 border border-slate-200 focus:border-indigo-500 focus:bg-white rounded-xl px-4 py-2.5 text-sm outline-none transition appearance-none">
+                        <option value="" disabled selected>-- Select category --</option>
+                        <option th:each="category : ${categories}"
+                                th:value="${category}"
+                                th:text="${category}">
+                            Category Preview
+                        </option>
+                    </select>
                 </div>
             </div>
 

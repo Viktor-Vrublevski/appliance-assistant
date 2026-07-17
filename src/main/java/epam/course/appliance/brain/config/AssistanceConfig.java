@@ -57,7 +57,7 @@ public class AssistanceConfig {
     public QuestionAnswerAdvisor questionAnswerAdvisor(ChromaVectorStore chromaVectorStore) {
         SearchRequest searchRequest = SearchRequest.builder()
                 .topK(3)
-                .similarityThreshold(0.5)
+                .similarityThreshold(0.7)
                 .build();
         return QuestionAnswerAdvisor.builder(chromaVectorStore)
                 .searchRequest(searchRequest)
