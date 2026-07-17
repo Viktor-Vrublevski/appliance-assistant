@@ -58,8 +58,9 @@ class FetchApplianceDataToolTest {
         String username = "testUser";
         String request = "List all my kitchen appliances";
         String conversationId = "conv-123";
+        String category = "Refrigerator";
         Appliance appliance = new Appliance();
-        appliance.setCategory("Refrigerator");
+        appliance.setCategory(category);
         List<Appliance> appliances = List.of(appliance);
         ChatResponse expectedResponse = mock(ChatResponse.class);
         when(toolContext.getContext()).thenReturn(Map.of(
@@ -72,7 +73,7 @@ class FetchApplianceDataToolTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.chatResponse()).thenReturn(expectedResponse);
 
-        ChatResponse actualResponse = fetchApplianceDataTool.fetchApplianceData(request, toolContext);
+        ChatResponse actualResponse = fetchApplianceDataTool.fetchApplianceData(category, request, toolContext);
 
         assertNotNull(actualResponse);
         assertEquals(expectedResponse, actualResponse);
@@ -93,10 +94,11 @@ class FetchApplianceDataToolTest {
     void testFetchApplianceData_ApplianceNotFound() {
         String username = "unknownUser";
         String request = "Show my devices";
+        String category = "TV-set";
         when(applianceService.getApplianceByUsername(username)).thenReturn(null);
         when(toolContext.getContext()).thenReturn(Map.of(KEY_USERNAME, username));
 
-        ChatResponse actualResponse = fetchApplianceDataTool.fetchApplianceData(request, toolContext);
+        ChatResponse actualResponse = fetchApplianceDataTool.fetchApplianceData(category, request, toolContext);
 
         assertNotNull(actualResponse);
         assertNotNull(actualResponse.getResults());

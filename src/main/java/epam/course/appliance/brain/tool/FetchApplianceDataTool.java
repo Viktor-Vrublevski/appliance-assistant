@@ -37,13 +37,21 @@ public class FetchApplianceDataTool {
     }
 
     @Tool(name = "fetchApplianceDataTool", description = FETCH_APPLIANCE_PROMPT)
-    public ChatResponse fetchApplianceData(String request, ToolContext toolContext) {
+    public ChatResponse fetchApplianceData(String category, String request, ToolContext toolContext) {
         String username = (String) toolContext.getContext().get(KEY_USERNAME);
         List<Appliance> appliances = applianceService.getApplianceByUsername(username);
         if (appliances == null) {
             LOGGER.info("Appliance with username {} not found", username);
             return ChatResponse.builder().generations(List.of(new Generation(AssistantMessage.builder()
                             .content("Appliance with username " + username + " not found")
+                            .build())))
+                    .build();
+        }
+        appliances = appliances.stream().filter(appliance -> appliance.getCategory().equals(category))
+                .toList();
+        if (appliances.isEmpty()) {
+            return ChatResponse.builder().generations(List.of(new Generation(AssistantMessage.builder()
+                            .content("User " + username + " has no appliances in category " + category)
                             .build())))
                     .build();
         }

@@ -1,5 +1,7 @@
 package epam.course.appliance.controller;
 
+import static epam.course.appliance.ApplianceConstant.KEY_CATEGORIES;
+
 import epam.course.appliance.brain.service.VectorStorageService;
 import epam.course.appliance.entity.Appliance;
 import epam.course.appliance.service.ApplianceService;
@@ -37,6 +39,9 @@ public class ApplianceController {
         }
         if (!model.containsAttribute("users")) {
             model.addAttribute("users", userService.getAllUsers());
+        }
+        if (!model.containsAttribute("categories")) {
+            model.addAttribute("categories", KEY_CATEGORIES);
         }
         return "create_appliance";
     }
