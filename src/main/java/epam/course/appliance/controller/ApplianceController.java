@@ -80,4 +80,25 @@ public class ApplianceController {
             return "redirect:/appliances/v1/create-view";
         }
     }
+
+    @GetMapping("/delete-view")
+    public String removeAppliancePage(Model model) {
+        if (!model.containsAttribute("appliance")) {
+            model.addAttribute("appliance", new Appliance());
+        }
+        return "remove_appliance";
+    }
+
+    @PostMapping("/delete")
+    public String removeAppliance(@RequestParam("username") String username,
+                                  @RequestParam("serialNumber") String serialNumber,
+                                  RedirectAttributes redirectAttributes) {
+        try {
+            applianceService.removeAppliance(username, serialNumber);
+            return "index";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Operation failed!");
+            return "redirect:/appliances/v1/delete-view";
+        }
+    }
 }

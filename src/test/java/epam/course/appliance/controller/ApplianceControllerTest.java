@@ -212,5 +212,49 @@ class ApplianceControllerTest {
         verifyNoInteractions(applianceService);
         verifyNoInteractions(vectorStorageService);
     }
+
+    @Test
+    void testRemoveAppliancePageWhenModelDoesNotHaveAppliancePopulatesIt() throws Exception {
+        mockMvc.perform(get("/appliances/v1/delete-view"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("remove_appliance"))
+                .andExpect(model().attributeExists("appliance"));
+    }
+
+    @Test
+    void testRemoveAppliancePageWhenModelAlreadyHasApplianceDoesNotOverwrite() throws Exception {
+        mockMvc.perform(get("/appliances/v1/delete-view")
+                        .flashAttr("appliance", new Appliance()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("remove_appliance"));
+    }
+
+    @Test
+    void testRemoveApplianceSuccess() throws Exception {
+        doNothing().when(applianceService).removeAppliance("john_doe", "SN12345");
+
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/appliances/v1/delete")
+                        .param("username", "john_doe")
+                        .param("serialNumber", "SN12345"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("index"));
+
+        verify(applianceService, times(1)).removeAppliance("john_doe", "SN12345");
+    }
+
+    @Test
+    void testRemoveApplianceExceptionThrownTriggersCatchBlock() throws Exception {
+        doThrow(new RuntimeException("Database error"))
+                .when(applianceService).removeAppliance("john_doe", "SN12345");
+
+        mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post("/appliances/v1/delete")
+                        .param("username", "john_doe")
+                        .param("serialNumber", "SN12345"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/appliances/v1/delete-view"))
+                .andExpect(flash().attribute("errorMessage", "Operation failed!"));
+
+        verify(applianceService, times(1)).removeAppliance("john_doe", "SN12345");
+    }
 }
 

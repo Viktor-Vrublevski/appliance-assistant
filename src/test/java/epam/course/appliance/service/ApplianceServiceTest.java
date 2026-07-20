@@ -1,7 +1,6 @@
 package epam.course.appliance.service;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -12,7 +11,6 @@ import static org.mockito.Mockito.when;
 import epam.course.appliance.entity.Appliance;
 import epam.course.appliance.repository.ApplianceRepository;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -78,5 +76,27 @@ class ApplianceServiceTest {
 
         assertTrue(result.isEmpty());
         verify(applianceRepository).findByOwner_Username("missing");
+    }
+
+    @Test
+    void removeApplianceSucceedsWhenRepositorySucceeds() {
+        org.mockito.Mockito.doNothing()
+                .when(applianceRepository).deleteByOwner_UsernameAndSerialNumber("john_doe", "SN-123");
+
+        applianceService.removeAppliance("john_doe", "SN-123");
+
+        verify(applianceRepository).deleteByOwner_UsernameAndSerialNumber("john_doe", "SN-123");
+    }
+
+    @Test
+    void removeApplianceThrowsRuntimeExceptionWhenRepositoryFails() {
+        org.mockito.Mockito.doThrow(new RuntimeException("Database error"))
+                .when(applianceRepository).deleteByOwner_UsernameAndSerialNumber("john_doe", "SN-123");
+
+        org.junit.jupiter.api.Assertions.assertThrows(RuntimeException.class, () -> {
+            applianceService.removeAppliance("john_doe", "SN-123");
+        });
+
+        verify(applianceRepository).deleteByOwner_UsernameAndSerialNumber("john_doe", "SN-123");
     }
 }

@@ -2,6 +2,7 @@ package epam.course.appliance.service;
 
 import epam.course.appliance.entity.Appliance;
 import epam.course.appliance.repository.ApplianceRepository;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,5 +32,16 @@ public class ApplianceService {
     
     public List<Appliance> getApplianceByUsername(String id) {
         return applianceRepository.findByOwner_Username(id);
+    }
+
+    @Transactional
+    public void removeAppliance(String username, String serialNumber) {
+        try {
+            applianceRepository.deleteByOwner_UsernameAndSerialNumber(username, serialNumber);
+            LOGGER.info("Appliance removed successfully");
+        } catch (Exception e) {
+            LOGGER.error("Error removing appliance", e);
+            throw new RuntimeException("Error removing appliance", e);
+        }
     }
 }

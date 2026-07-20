@@ -40,4 +40,13 @@ public class UserService {
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
+
+    public void deleteUser(String username) {
+        if (userRepository.existsById(username)) {
+        userRepository.deleteById(username);
+        } else {
+            LOGGER.error("User with username '{}' does not exist", username);
+            throw new IllegalArgumentException("User with username '" + username + "' does not exist");
+        }
+    }
 }

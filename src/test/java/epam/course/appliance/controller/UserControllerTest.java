@@ -60,7 +60,6 @@ class UserControllerTest {
     }
 
 
-
     @Test
     void testCreateUserSuccess() throws Exception {
         when(userService.saveUser(any(User.class))).thenReturn(true);
@@ -100,5 +99,51 @@ class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("create_user"))
                 .andExpect(model().attribute("errorMessage", "An error occurred while saving the user."));
+    }
+
+    @Test
+    void testRemoveUserPageWhenUserAttributeNotPresentAddsNewUserToModel() throws Exception {
+        mockMvc.perform(get("/users/v1/delete-view"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("remove_user"))
+                .andExpect(model().attributeExists("user"));
+    }
+
+    @Test
+    void testRemoveUserPageWhenUserAttributeAlreadyPresentDoesNotOverwrite() throws Exception {
+        User existingUser = new User();
+        existingUser.setUsername("existing_user");
+
+        mockMvc.perform(get("/users/v1/delete-view")
+                        .flashAttr("user", existingUser))
+                .andExpect(status().isOk())
+                .andExpect(view().name("remove_user"))
+                .andExpect(model().attribute("user", existingUser));
+    }
+
+    @Test
+    void testDeleteUserSuccess() throws Exception {
+        org.mockito.Mockito.doNothing().when(userService).deleteUser("johndoe");
+
+        mockMvc.perform(post("/users/v1/delete")
+                        .param("username", "johndoe"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("index"));
+
+        verify(userService, times(1)).deleteUser("johndoe");
+    }
+
+    @Test
+    void testDeleteUserExceptionThrownTriggersCatchBlock() throws Exception {
+        org.mockito.Mockito.doThrow(new RuntimeException("User not found"))
+                .when(userService).deleteUser("johndoe");
+
+        mockMvc.perform(post("/users/v1/delete")
+                        .param("username", "johndoe"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/users/v1/delete-view"))
+                .andExpect(flash().attribute("errorMessage", "An error occurred while deleting the user."));
+
+        verify(userService, times(1)).deleteUser("johndoe");
     }
 }
