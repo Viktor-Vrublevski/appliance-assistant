@@ -39,7 +39,7 @@ public class MainController {
         User user = userService.getUserById(username);
         if (user == null) {
             redirectAttributes.addFlashAttribute("errorMessage", "there is not such username");
-            return "redirect:/login";
+            return "redirect:/login-view";
         }
         UserChatData userChatData = new UserChatData();
         userChatData.setUsername(username);
