@@ -4,6 +4,7 @@ import epam.course.appliance.entity.User;
 import epam.course.appliance.service.UserService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,6 +48,28 @@ public class UserController {
         } catch (Exception e) {
             model.addAttribute("errorMessage", "An error occurred while saving the user.");
             return "create_user";
+        }
+    }
+
+    @GetMapping("/delete-view")
+    public String removeUserPage(Model model) {
+        if (!model.containsAttribute("user")) {
+            model.addAttribute("user", new User());
+        }
+        return "remove_user";
+    }
+
+    @PostMapping("/delete")
+    public String deleteUser(@RequestParam("username") String username,
+                             RedirectAttributes redirectAttributes) {
+        try {
+        userService.deleteUser(username);
+        return "index";
+        } catch (Exception e) {
+            redirectAttributes
+                    .addFlashAttribute("errorMessage",
+                            "An error occurred while deleting the user.");
+            return "redirect:/users/v1/delete-view";
         }
     }
 }

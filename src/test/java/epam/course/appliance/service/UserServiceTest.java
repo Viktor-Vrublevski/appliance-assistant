@@ -104,4 +104,27 @@ class UserServiceTest {
         assertEquals(users, result);
         verify(userRepository).findAll();
     }
+
+    @Test
+    void deleteUserSucceedsWhenUserExists() {
+        when(userRepository.existsById("jdoe")).thenReturn(true);
+        org.mockito.Mockito.doNothing().when(userRepository).deleteById("jdoe");
+
+        userService.deleteUser("jdoe");
+
+        verify(userRepository).existsById("jdoe");
+        verify(userRepository).deleteById("jdoe");
+    }
+
+    @Test
+    void deleteUserThrowsIllegalArgumentExceptionWhenUserDoesNotExist() {
+        when(userRepository.existsById("missing")).thenReturn(false);
+
+        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            userService.deleteUser("missing");
+        });
+
+        verify(userRepository).existsById("missing");
+        org.mockito.Mockito.verifyNoMoreInteractions(userRepository);
+    }
 }
