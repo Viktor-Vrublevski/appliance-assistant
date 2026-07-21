@@ -16,9 +16,30 @@ frustration by combining AI-powered document retrieval with structured data mana
 - **Comprehensive Asset Tracking**: Maintains a SQL-based inventory of household appliances, including device names,
   purchase dates, maintenance schedules, and complete issue history.
 
-- **Automated Maintenance Logging**: Features an agentic AI loop that not only provides step-by-step repair instructions
-  by analyzing manufacturer documentation, but also automatically logs resolved issues and maintenance events to a
-  database for future reference.
-
 Simply describe your appliance problem in natural language, and the system retrieves precise instructions from the
 appropriate manual while maintaining an organized record of all maintenance activities.
+
+
+## Local Run
+
+Download Chroma DB from Docker Hub: [https://hub.docker.com/r/chroma/chroma](https://hub.docker.com/r/chromadb/chroma)
+Run chroma db using Docker:
+````bash
+docker run -p 8000:8000 chromadb/chroma
+````
+
+### Set up PostgreSQL
+Download PostgreSQL from Docker Hub: [https://hub.docker.com/_/postgres](https://hub.docker.com/_/postgres)
+Run PostgreSQL using Docker:
+````bash
+docker run -p 5432:5432 -e POSTGRES_PASSWORD=postgres -d postgres
+````
+
+### Add API Anthropic Key
+
+Set the ANTHROPIC_API_KEY environment variable before running the application.
+
+Run application:
+````bash
+./mvnw spring-boot:run
+````
