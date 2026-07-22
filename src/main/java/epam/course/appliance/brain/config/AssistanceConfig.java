@@ -38,12 +38,11 @@ public class AssistanceConfig {
     @Bean
     public ChatClient ragChatClient(ChatClient.Builder builder,
                                     ChatOptions anthropicChatOptions,
-                                    MessageChatMemoryAdvisor messageChatMemoryAdvisor,
                                     QuestionAnswerAdvisor questionAnswerAdvisor,
                                     @Value("classpath:system-prompt.xml") Resource resource) {
         return builder
                 .defaultSystem(resource)
-                .defaultAdvisors(messageChatMemoryAdvisor, questionAnswerAdvisor)
+                .defaultAdvisors(questionAnswerAdvisor)
                 .defaultOptions(anthropicChatOptions)
                 .build();
     }
@@ -56,8 +55,8 @@ public class AssistanceConfig {
     @Bean
     public QuestionAnswerAdvisor questionAnswerAdvisor(ChromaVectorStore chromaVectorStore) {
         SearchRequest searchRequest = SearchRequest.builder()
-                .topK(3)
-                .similarityThreshold(0.5)
+                .topK(6)
+                .similarityThreshold(0.3)
                 .build();
         return QuestionAnswerAdvisor.builder(chromaVectorStore)
                 .searchRequest(searchRequest)
