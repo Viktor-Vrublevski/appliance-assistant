@@ -47,6 +47,7 @@ public class FetchApplianceDataTool {
                             .build())))
                     .build();
         }
+        LOGGER.info("Appliance with username {} found", username);
         appliances = appliances.stream().filter(appliance -> appliance.getCategory().equals(category))
                 .toList();
         if (appliances.isEmpty()) {
